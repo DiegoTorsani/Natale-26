@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - StudyPlanner{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">
+    <i class="fas fa-chart-line"></i> Dashboard
+</h1>
+
+<!-- Statistiche Principali -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card blue">
+            <h3>{{ total_hours }}</h3>
+            <p><i class="fas fa-clock"></i> Ore Totali di Studio</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card green">
+            <h3>{{ total_sessions }}</h3>
+            <p><i class="fas fa-book"></i> Sessioni Completate</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card orange">
+            <h3>{{ total_subjects }}</h3>
+            <p><i class="fas fa-layer-group"></i> Materie Attive</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-bolt"></i> Azioni Rapide</h5>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('main.session_create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuova Sessione
+                    </a>
+                    <a href="{{ url_for('main.subject_create') }}" class="btn btn-success">
+                        <i class="fas fa-folder-plus"></i> Nuova Materia
+                    </a>
+                    <a href="{{ url_for('main.sessions_list') }}" class="btn btn-info">
+                        <i class="fas fa-list"></i> Tutte le Sessioni
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafico Trend Mensile -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-area"></i> Ore di Studio per Mese ({{ current_year }})
+                </h5>
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistiche per Materia -->
+{% if subject_stats %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-graduation-cap"></i> Ore di Studio per Materia
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Materia</th>
+                                <th class="text-center">Sessioni</th>
+                                <th class="text-center">Ore Totali</th>
+                                <th width="40%">Progresso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in subject_stats %}
+                            <tr>
+                                <td>
+                                    <span class="subject-badge" style="background-color: {{ stat.subject_color }};">
+                                        {{ stat.subject_name }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary">{{ stat.session_count }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <strong>{{ stat.total_hours }}h</strong>
+                                </td>
+                                <td>
+                                    {% set percentage = (stat.total_hours / total_hours * 100)|int if total_hours > 0 else 0 %}
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {{ percentage }}%; background-color: {{ stat.subject_color }};"
+                                             aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                            {{ percentage }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafico a Torta per Materie -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-pie"></i> Distribuzione Ore per Materia
+                </h5>
+                <canvas id="subjectChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sessioni Recenti -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-history"></i> Ultimi 7 Giorni
+                </h5>
+                {% if recent_sessions %}
+                <div class="list-group">
+                    {% for session in recent_sessions[:5] %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ session.topic }}</h6>
+                            <small>{{ session.date.strftime('%d/%m') }}</small>
+                        </div>
+                        <p class="mb-1">
+                            <span class="subject-badge" style="background-color: {{ session.subject.color }};">
+                                {{ session.subject.name }}
+                            </span>
+                        </p>
+                        <small><i class="fas fa-clock"></i> {{ session.duration_minutes }} minuti</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">Nessuna sessione negli ultimi 7 giorni.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> 
+    Non hai ancora registrato sessioni di studio. 
+    <a href="{{ url_for('main.session_create') }}" class="alert-link">Inizia ora!</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Attendi che il DOM sia completamente caricato
+    document.addEventListener('DOMContentLoaded', function() {
+        // Grafico Trend Mensile
+        const monthlyChartElement = document.getElementById('monthlyChart');
+        if (monthlyChartElement) {
+            const monthlyCtx = monthlyChartElement.getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ months_labels|tojson }},
+                    datasets: [{
+                        label: 'Ore di Studio',
+                        data: {{ monthly_hours|tojson }},
+                        borderColor: 'rgb(52, 152, 219)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: 'rgb(52, 152, 219)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + 'h';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        {% if subject_stats %}
+        // Grafico a Torta per Materie
+        const subjectChartElement = document.getElementById('subjectChart');
+        if (subjectChartElement) {
+            const subjectCtx = subjectChartElement.getContext('2d');
+            new Chart(subjectCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [{% for stat in subject_stats %}'{{ stat.subject_name }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                    datasets: [{
+                        data: [{% for stat in subject_stats %}{{ stat.total_hours }}{% if not loop.last %}, {% endif %}{% endfor %}],
+                        backgroundColor: [{% for stat in subject_stats %}'{{ stat.subject_color }}'{% if not loop.last %}, {% endif %}{% endfor %}],
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        {% endif %}
+    });
+</script>
+{% endblock %}

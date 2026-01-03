@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{% if subject %}Modifica{% else %}Nuova{% endif %} Materia - StudyPlanner{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    <i class="fas fa-layer-group"></i> 
+                    {% if subject %}Modifica Materia{% else %}Nuova Materia{% endif %}
+                </h2>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nome Materia *</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="name" 
+                               name="name" 
+                               value="{{ subject.name if subject else '' }}"
+                               placeholder="Es: Matematica"
+                               required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descrizione (opzionale)</label>
+                        <textarea class="form-control" 
+                                  id="description" 
+                                  name="description" 
+                                  rows="3"
+                                  placeholder="Aggiungi una breve descrizione...">{{ subject.description if subject else '' }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="color" class="form-label">Colore</label>
+                        <input type="color" 
+                               class="form-control form-control-color" 
+                               id="color" 
+                               name="color" 
+                               value="{{ subject.color if subject else '#3498db' }}"
+                               title="Scegli un colore per la materia">
+                        <small class="form-text text-muted">Il colore aiuta a identificare visivamente la materia</small>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('main.subjects_list') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Annulla
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Salva
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Suggerimenti colori -->
+        {% if not subject %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6><i class="fas fa-palette"></i> Suggerimenti di Colore:</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm" style="background-color: #3498db; color: white;" 
+                            onclick="document.getElementById('color').value='#3498db'">Blu</button>
+                    <button type="button" class="btn btn-sm" style="background-color: #e74c3c; color: white;" 
+                            onclick="document.getElementById('color').value='#e74c3c'">Rosso</button>
+                    <button type="button" class="btn btn-sm" style="background-color: #2ecc71; color: white;" 
+                            onclick="document.getElementById('color').value='#2ecc71'">Verde</button>
+                    <button type="button" class="btn btn-sm" style="background-color: #f39c12; color: white;" 
+                            onclick="document.getElementById('color').value='#f39c12'">Arancione</button>
+                    <button type="button" class="btn btn-sm" style="background-color: #9b59b6; color: white;" 
+                            onclick="document.getElementById('color').value='#9b59b6'">Viola</button>
+                    <button type="button" class="btn btn-sm" style="background-color: #1abc9c; color: white;" 
+                            onclick="document.getElementById('color').value='#1abc9c'">Turchese</button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

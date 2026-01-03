@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{% if study_session %}Modifica{% else %}Nuova{% endif %} Sessione - StudyPlanner{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    <i class="fas fa-book"></i> 
+                    {% if study_session %}Modifica Sessione{% else %}Nuova Sessione di Studio{% endif %}
+                </h2>
+                
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="topic" class="form-label">Argomento Studiato *</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="topic" 
+                               name="topic" 
+                               value="{{ study_session.topic if study_session else '' }}"
+                               placeholder="Es: Equazioni di secondo grado"
+                               required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="subject_id" class="form-label">Materia *</label>
+                                <select class="form-select" id="subject_id" name="subject_id" required>
+                                    <option value="">Seleziona una materia</option>
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject.id }}" 
+                                            {% if study_session and study_session.subject_id == subject.id %}selected{% endif %}>
+                                        {{ subject.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Data *</label>
+                                <input type="date" 
+                                       class="form-control" 
+                                       id="date" 
+                                       name="date" 
+                                       value="{{ study_session.date if study_session else today }}"
+                                       max="{{ today }}"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="duration_minutes" class="form-label">Durata (minuti) *</label>
+                        <input type="number" 
+                               class="form-control" 
+                               id="duration_minutes" 
+                               name="duration_minutes" 
+                               value="{{ study_session.duration_minutes if study_session else '' }}"
+                               min="1"
+                               placeholder="Es: 60"
+                               required>
+                        <small class="form-text text-muted">Inserisci la durata in minuti (es: 60 = 1 ora)</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Note (opzionale)</label>
+                        <textarea class="form-control" 
+                                  id="notes" 
+                                  name="notes" 
+                                  rows="4"
+                                  placeholder="Aggiungi note o commenti sulla sessione...">{{ study_session.notes if study_session else '' }}</textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('main.sessions_list') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Annulla
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salva
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
