@@ -8,32 +8,6 @@
 
 **StudyPlanner** è un'applicazione web sviluppata con Flask per aiutare gli studenti a tracciare e gestire le proprie sessioni di studio in preparazione all'esame di maturità. L'applicazione permette di organizzare lo studio per materie, registrare le ore dedicate ad ogni argomento e visualizzare statistiche dettagliate sui progressi.
 
-### ✨ Funzionalità Principali
-
-#### 🔐 Livello 1 - Base (Implementato)
-- **Autenticazione Completa**: Sistema di registrazione e login con hashing delle password
-- **CRUD Sessioni di Studio**: Crea, leggi, aggiorna ed elimina sessioni di studio
-- **Gestione Profilo Utente**: Ogni utente ha il proprio spazio personale
-
-#### 📊 Livello 2 - Intermedio (Implementato)
-- **Gestione Materie**: Sistema di categorie (relazione 1-a-N)
-- **Associazione Sessione-Materia**: Ogni sessione è collegata a una specifica materia
-- **Colori Personalizzati**: Ogni materia ha un colore distintivo per facilitare la visualizzazione
-
-#### 🚀 Livello 3 - Avanzato (Implementato)
-- **Dashboard con Statistiche Aggregate**: Utilizza query SQL complesse con `GROUP BY`, `SUM`, `AVG`
-- **Ore Totali per Materia**: Visualizzazione del tempo dedicato a ogni materia
-- **Grafici Interattivi**: 
-  - Grafico a linee per il trend mensile
-  - Grafico a torta per la distribuzione delle ore per materia
-- **Statistiche Dettagliate**: Conteggio sessioni, ore totali, media ore per sessione
-
-#### 🎯 Funzionalità Bonus
-- **Sessioni Recenti**: Vista rapida delle ultime attività di studio
-- **Dettaglio Materia**: Pagina dedicata per ogni materia con tutte le sue sessioni
-- **Interfaccia Responsiva**: Design moderno con Bootstrap 5
-- **Validazione Form**: Controlli lato server per garantire l'integrità dei dati
-
 ---
 
 ## 🏗️ Architettura del Progetto
@@ -153,68 +127,21 @@ Separazione completa tra logica di business e accesso ai dati:
 
 1. **Clona il repository**
    ```bash
-   git clone <url-repository>
-   cd Natale-26
+   git clone https://github.com/DiegoTorsani/Natale-26.git
    ```
 
-2. **Crea un ambiente virtuale**
-   ```bash
-   python -m venv .venv
-   ```
-
-3. **Attiva l'ambiente virtuale**
-   - Windows:
-     ```bash
-     .venv\Scripts\activate
-     ```
-   - macOS/Linux:
-     ```bash
-     source .venv/bin/activate
-     ```
-
-4. **Installa le dipendenze**
+2. **Installa le dipendenze**
    ```bash
    pip install -r requirements.txt
    ```
 
-5. **Avvia l'applicazione**
+3. **Avvia l'applicazione**
    ```bash
    python run.py
    ```
 
-6. **Apri il browser**
+4. **Apri il browser**
    Naviga su: `http://localhost:5000`
-
----
-
-## 📊 Query SQL Avanzate (Livello 3)
-
-### Ore Totali per Materia
-```python
-db.session.query(
-    Subject.name,
-    Subject.color,
-    func.sum(StudySession.duration_minutes).label('total_minutes'),
-    func.count(StudySession.id).label('session_count')
-).join(StudySession.subject)\
- .filter(StudySession.user_id == user_id)\
- .group_by(Subject.id, Subject.name, Subject.color)\
- .order_by(func.sum(StudySession.duration_minutes).desc())\
- .all()
-```
-
-### Trend Mensile
-```python
-db.session.query(
-    extract('month', StudySession.date).label('month'),
-    func.sum(StudySession.duration_minutes).label('total_minutes')
-).filter(
-    StudySession.user_id == user_id,
-    extract('year', StudySession.date) == year
-).group_by('month')\
- .order_by('month')\
- .all()
-```
 
 ---
 
@@ -241,34 +168,7 @@ db.session.query(
 
 ---
 
-## 📈 Statistiche del Progetto
 
-- **File Python**: 8
-- **Template HTML**: 10
-- **Linee di Codice**: ~1500+
-- **Funzionalità CRUD**: 2 (Sessioni e Materie)
-- **Query Aggregate**: 3
-- **Blueprint**: 2
-- **Livello Raggiunto**: ⭐⭐⭐ Avanzato
-
----
-
-## 🎓 Obiettivi Didattici Raggiunti
-
-✅ Struttura a pacchetto con `__init__.py`  
-✅ Application Factory Pattern  
-✅ Uso di Blueprints per modularità  
-✅ Repository Pattern implementato  
-✅ Gestione sessioni e autenticazione  
-✅ Protezione delle rotte  
-✅ Hashing delle password  
-✅ Template Jinja2 con ereditarietà  
-✅ Relazioni 1-a-N nel database  
-✅ Query SQL aggregate complesse (GROUP BY, SUM, AVG)  
-✅ Dashboard con statistiche in tempo reale  
-✅ Grafici interattivi con Chart.js  
-
----
 
 ## 📝 Possibili Sviluppi Futuri
 
@@ -284,8 +184,7 @@ db.session.query(
 
 ## 👨‍💻 Autore
 
-**Diego**  
-Progetto sviluppato per il corso di Sviluppo Web - Natale 2026
+Sviluppato come applicazione web moderna per la gestione del tempo di studio
 
 ---
 
@@ -295,10 +194,4 @@ Questo progetto è stato sviluppato a scopo didattico.
 
 ---
 
-## 🙏 Ringraziamenti
-
-Grazie al professore per l'opportunità di mettere in pratica le competenze apprese durante il corso!
-
----
-
-**Buono studio a tutti! 📚✨**
+**Gestisci il tuo tempo di studio in modo intelligente! 📚✨**
